@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>{{.Title}}</title>
+		<script>
+			const delay = time => new Promise(resolve => setTimeout(resolve, time))
+			async function reload() {
+				const res = await (await fetch("/update")).json(); 
+				document.getElementsByTagName('body')[0].innerHTML = res["content"]
+				return delay(res["interval"]/2).then(reload)
+			}
+			window.addEventListener('DOMContentLoaded', function start() {
+				delay( {{ .Interval.Milliseconds }} / 2 ).then(reload).catch(console.error)
+			})
+		</script>
+	</head>
+	<body>
+		{{template "content.html" .}}
+	</body>
+</html>

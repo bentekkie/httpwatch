@@ -1,0 +1,9 @@
+<div {{if .NoTitle}} style="display: none;" {{end}}  >
+    <div style="float: left;" >Every <span>{{ .Interval }}</span>: <code>{{ .Cmd }}</code></div>
+    <div style="float: right;"><span>{{ .UpdatedAt }}</span></div>
+    <br/>
+    <br/>
+</div>
+<div>
+    {{if .Err }} {{ .Err }} {{else}} {{ .Output }} {{end}}
+</div>
