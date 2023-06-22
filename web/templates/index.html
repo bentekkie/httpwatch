@@ -5,13 +5,19 @@
 		<title>{{.Title}}</title>
 		<script>
 			const delay = time => new Promise(resolve => setTimeout(resolve, time))
+			let interval = {{ .Interval.Milliseconds }} / 2
 			async function reload() {
-				const res = await (await fetch("/update")).json(); 
-				document.getElementsByTagName('body')[0].innerHTML = res["content"]
-				return delay(res["interval"]/2).then(reload)
+				try {
+					const res = await (await fetch("/update")).json(); 
+					interval = res["interval"]/2
+					document.getElementsByTagName('body')[0].innerHTML = res["content"]
+				} catch (e) {
+					console.error(e)
+				}
+				return delay(interval).then(reload)
 			}
 			window.addEventListener('DOMContentLoaded', function start() {
-				delay( {{ .Interval.Milliseconds }} / 2 ).then(reload).catch(console.error)
+				delay(interval).then(reload).catch(console.error)
 			})
 		</script>
 	</head>

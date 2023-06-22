@@ -9,7 +9,9 @@ var (
 
 	//go:embed templates/*
 	tmplFiles embed.FS
-	Template  *template.Template
+
+	// Template holds all the parsed templates in the templates directory
+	Template *template.Template
 )
 
 func init() {

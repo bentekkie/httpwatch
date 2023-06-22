@@ -43,14 +43,13 @@ func main() {
 	if len(c.cmd) == 0 {
 		log.Fatal("No command specified")
 	}
+	err := mime.AddExtensionType(".js", "text/javascript")
+	if err != nil {
+		log.Fatalf("Error in mime js: %v", err)
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go c.Run(ctx)
-
-	err1 := mime.AddExtensionType(".js", "text/javascript")
-	if err1 != nil {
-		log.Printf("Error in mime js %s", err1.Error())
-	}
 
 	r := http.NewServeMux()
 	r.HandleFunc("/update", c.WriteUpdate)
@@ -59,7 +58,7 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
-		c.WriteFull(w, r)
+		c.WriteIndex(w, r)
 	})
 
 	fmt.Printf("Listening at http://%v\n", *address)
@@ -82,6 +81,7 @@ func main() {
 	}
 }
 
+// Command describes the command to be run
 type Command struct {
 	cmd       []string
 	mu        sync.RWMutex
@@ -90,6 +90,7 @@ type Command struct {
 	err       error
 }
 
+// Run executues the command every interval until the context is canceled
 func (c *Command) Run(ctx context.Context) {
 	next := time.Now().Add(*interval)
 	c.update(ctx)
@@ -143,7 +144,8 @@ func (c *Command) tplData() tplData {
 	}
 }
 
-func (c *Command) WriteFull(w http.ResponseWriter, r *http.Request) {
+// WriteIndex writes the index html page with the command results
+func (c *Command) WriteIndex(w http.ResponseWriter, r *http.Request) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	err := web.Template.Lookup("index.html").Execute(w, c.tplData())
@@ -151,6 +153,8 @@ func (c *Command) WriteFull(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error: %v", err)
 	}
 }
+
+// WriteUpdate sends the updated command result
 func (c *Command) WriteUpdate(w http.ResponseWriter, r *http.Request) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
