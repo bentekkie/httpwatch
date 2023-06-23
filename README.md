@@ -1,5 +1,7 @@
 # httpwatch
 
+![Go Build and Test](https://github.com/bentekkie/httpwatch/actions/workflows/go.yml/badge.svg) [![PkgGoDev](https://pkg.go.dev/badge/github.com/bentekkie/httpwatch)](https://pkg.go.dev/github.com/bentekkie/httpwatch)
+
 A basic equivilant to the `watch` command that serves the output via an http server.
 
 Functionality is mostly the same for flags -n, -t and -c. --address is used to specify a tcp ip and port.
