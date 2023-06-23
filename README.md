@@ -10,8 +10,16 @@ Functionality is mostly the same for flags -n, -t and -c. --address is used to s
 go install github.com/bentekkie/httpwatch/cmd/httpwatch
 ```
 
-
 ## Usage
+
+```
+$ httpwatch -h
+Usage: httpwatch [-flags] -- command ...
+  -a, --address string      Address to serve the output of the command to. (default "127.0.0.1:8000")
+  -c, --color               Interpret ANSI color and style sequences.
+  -n, --interval duration   Specify update interval.  The command will not allow quicker than 0.1 second interval, in which the smaller values are converted. The WATCH_INTERVAL environment can be used to persistently set a non-default interval (following the same rules and formatting). (default 2s)
+  -t, --no-title            Turn off the header showing the interval, command, and current time at the top of the display, as well as the following blank line.
+```
 
 ```
 $ httpwatch -n 0.5s -- date

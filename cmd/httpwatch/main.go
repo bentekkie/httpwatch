@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"html/template"
 	"log"
@@ -17,25 +16,34 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bentekkie/httpwatch/web"
 	"github.com/robert-nix/ansihtml"
+	flag "github.com/spf13/pflag"
+
+	"github.com/bentekkie/httpwatch/web"
 )
 
 var (
-	interval = flag.Duration("n", 2*time.Second, "Specify update interval.  The command will not allow quicker than 0.1 second interval, in which the smaller values are converted. The WATCH_INTERVAL environment can be used to persistently set a non-default interval (following the same rules and formatting).")
-	noTitle  = flag.Bool("t", false, "Turn off the header showing the interval, command, and current time at the top of the display, as well as the following blank line.")
-	color    = flag.Bool("c", false, "Interpret ANSI color and style sequences.")
-	address  = flag.String("address", "127.0.0.1:8000", "Address to serve the output of the command to.")
+	interval = flag.DurationP("interval", "n", 2*time.Second, "Specify update interval.  The command will not allow quicker than 0.1 second interval, in which the smaller values are converted. The WATCH_INTERVAL environment can be used to persistently set a non-default interval (following the same rules and formatting).")
+	noTitle  = flag.BoolP("no-title", "t", false, "Turn off the header showing the interval, command, and current time at the top of the display, as well as the following blank line.")
+	color    = flag.BoolP("color", "c", false, "Interpret ANSI color and style sequences.")
+	address  = flag.StringP("address", "a", "127.0.0.1:8000", "Address to serve the output of the command to.")
 )
 
 const minInterval = time.Second / 10
 
 func main() {
 	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %v [-flags] -- command ...\n", path.Base(os.Args[0]))
+		fmt.Fprintf(os.Stderr, "Usage: %v [-flags] -- command ...\n", path.Base(os.Args[0]))
 		flag.PrintDefaults()
 	}
 	flag.Parse()
+	if val, ok := os.LookupEnv("WATCH_INTERVAL"); ok {
+		in, err := time.ParseDuration(val)
+		if err != nil {
+			log.Fatalf("Error parsing 'WATCH_INTERVAL=%v' as a duration: %v", val, err)
+		}
+		*interval = in
+	}
 	if *interval < minInterval {
 		*interval = minInterval
 	}
