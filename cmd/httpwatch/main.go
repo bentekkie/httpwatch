@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"html/template"
 	"log"
-	"mime"
 	"net/http"
 	"os"
 	"os/exec"
@@ -50,10 +49,6 @@ func main() {
 	c := &Command{cmd: flag.Args()}
 	if len(c.cmd) == 0 {
 		log.Fatal("No command specified")
-	}
-	err := mime.AddExtensionType(".js", "text/javascript")
-	if err != nil {
-		log.Fatalf("Error in mime js: %v", err)
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
